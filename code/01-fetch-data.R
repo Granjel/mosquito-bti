@@ -9,15 +9,15 @@ library(readxl)
 drive_find(pattern = "mosquito-bti", type = "spreadsheet") %>%
   drive_download(
     type = "xlsx",
-    path = "data/mosquito-bti.xlsx",
+    path = "data/mosquito-bti-raw.xlsx",
     overwrite = TRUE
   )
 
 # load data set
-data <- readxl::read_xlsx("data/mosquito-bti.xlsx", sheet = 1) %>%
+data <- readxl::read_xlsx("data/mosquito-bti-raw.xlsx", sheet = 1) %>%
   mutate(
-    # create id tag for each row to identify them more easily
-    id = paste(date, mosquito, bti, food, n, reading, sep = "_"),
+    # create id tag for each jar
+    jar = paste(date, mosquito, bti, food, n, sep = "_"),
     # create a column with the combination of treatments
     treatment = paste(bti, food, sep = "_"),
     # date and time need to be fixed for R
@@ -46,9 +46,12 @@ data <- readxl::read_xlsx("data/mosquito-bti.xlsx", sheet = 1) %>%
     food,
     treatment,
     n,
+    jar,
     reading,
     alive,
     dead,
-    perc,
-    id
+    perc
   )
+
+# save as csv
+write.csv(data, "data/mosquito-bti-clean.csv", row.names = FALSE)

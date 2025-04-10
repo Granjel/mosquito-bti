@@ -13,7 +13,6 @@ theme_set(theme_bw() + theme(strip.background = element_blank()))
 # paths in time ----------------------------------------------------------
 
 p1 <- data %>%
-  filter(reading != 24) %>% # todo remove this line after getting the results
   ggplot(aes(x = reading, y = perc, color = bti, group = n)) +
   facet_grid(
     food ~ bti
@@ -25,7 +24,8 @@ p1 <- data %>%
   scale_y_continuous(
     sec.axis = sec_axis(~., name = "Food", breaks = NULL, labels = NULL)
   ) +
-  scale_x_continuous(
+  scale_x_log10(
+    breaks = c(1:6, 24),
     sec.axis = sec_axis(~., name = "BTi", breaks = NULL, labels = NULL)
   ) +
   theme(legend.position = "none")

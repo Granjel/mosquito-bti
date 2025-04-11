@@ -34,8 +34,8 @@ ggsave(
   p1,
   filename = paste0("figures/", today(), "-paths.png"),
   dpi = 320,
-  width = 5,
-  height = 3,
+  width = 6,
+  height = 4,
   device = "png"
 )
 

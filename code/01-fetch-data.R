@@ -9,14 +9,14 @@ library(readxl)
 drive_find(pattern = "bti-data", type = "spreadsheet") %>%
   drive_download(
     type = "xlsx",
-    path = "data/final-bti-raw.xlsx",
+    path = "data/bti-raw.xlsx",
     overwrite = TRUE
   )
 
 # load data set from different experiments and label them
-exp2 <- readxl::read_xlsx("data/final-bti-raw.xlsx", sheet = 2) %>%
+exp2 <- readxl::read_xlsx("data/bti-raw.xlsx", sheet = 2) %>%
   mutate(experiment = 2)
-exp3 <- readxl::read_xlsx("data/final-bti-raw.xlsx", sheet = 3) %>%
+exp3 <- readxl::read_xlsx("data/bti-raw.xlsx", sheet = 3) %>%
   mutate(experiment = 3)
 
 # merge them in a unique data set

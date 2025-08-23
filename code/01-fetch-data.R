@@ -14,15 +14,13 @@ drive_find(pattern = "bti-data", type = "spreadsheet") %>%
   )
 
 # load data set from different experiments and label them
-exp1 <- readxl::read_xlsx("data/final-bti-raw.xlsx", sheet = 1) %>%
-  mutate(experiment = 1)
 exp2 <- readxl::read_xlsx("data/final-bti-raw.xlsx", sheet = 2) %>%
   mutate(experiment = 2)
 exp3 <- readxl::read_xlsx("data/final-bti-raw.xlsx", sheet = 3) %>%
   mutate(experiment = 3)
 
 # merge them in a unique data set
-data <- rbind(exp1, exp2, exp3) %>% relocate(experiment)
+data <- rbind(exp2, exp3) %>% relocate(experiment)
 
 # modifications in the data set
 data <- data %>%
@@ -43,6 +41,12 @@ data <- data %>%
   ) %>%
   # add treatment as the combination of Bti and food
   mutate(treatment = paste(bti, food, sep = "_")) %>%
+  # add survival rate, number of dead, and exitus rate
+  mutate(
+    survival = alive / initial,
+    dead = initial - alive,
+    exitus = 1 - survival
+  ) %>%
   # rename time because it also has the date within
   rename(datetime = time) %>%
   # rearrange the order of the columns
@@ -57,8 +61,15 @@ data <- data %>%
     n,
     jar,
     reading,
-    alive
+    initial,
+    alive,
+    survival,
+    dead,
+    exitus
   )
+
+# clean environment
+rm(exp2, exp3)
 
 # save as csv
 write.csv(data, "data/bti-clean.csv", row.names = FALSE)

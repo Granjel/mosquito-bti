@@ -6,52 +6,59 @@ library(tidyverse)
 library(readxl)
 
 # download data
-drive_find(pattern = "mosquito-bti", type = "spreadsheet") %>%
+drive_find(pattern = "bti-data", type = "spreadsheet") %>%
   drive_download(
     type = "xlsx",
-    path = "data/mosquito-bti-raw.xlsx",
+    path = "data/final-bti-raw.xlsx",
     overwrite = TRUE
   )
 
-# load data set
-data <- readxl::read_xlsx("data/mosquito-bti-raw.xlsx", sheet = 1) %>%
+# load data set from different experiments and label them
+exp1 <- readxl::read_xlsx("data/final-bti-raw.xlsx", sheet = 1) %>%
+  mutate(experiment = 1)
+exp2 <- readxl::read_xlsx("data/final-bti-raw.xlsx", sheet = 2) %>%
+  mutate(experiment = 2)
+exp3 <- readxl::read_xlsx("data/final-bti-raw.xlsx", sheet = 3) %>%
+  mutate(experiment = 3)
+
+# merge them in a unique data set
+data <- rbind(exp1, exp2, exp3) %>% relocate(experiment)
+
+# modifications in the data set
+data <- data %>%
   mutate(
     # create id tag for each jar
-    jar = paste(date, mosquito, bti, food, n, sep = "_"),
-    # create a column with the combination of treatments
-    treatment = paste(bti, food, sep = "_"),
+    jar = paste(experiment, unit, bti, food, n, sep = "_"),
     # date and time need to be fixed for R
     date = as.Date(date),
     time = as.POSIXct(paste(date, format(time, "%H:%M:%S")), tz = "UTC"),
-    # order bti levels # todo change if new levels are present
+    # order bti levels
     bti = factor(
       bti,
-      levels = c("control", "high"),
+      levels = c("C", "H"),
       labels = c("Control", "High")
     ),
-    # order food levels # todo change if new levels are present
-    food = factor(food, levels = c("low", "high"), labels = c("Low", "High")),
-    # calculate percentage of dead individuals
-    perc = (dead / (dead + alive)) * 100
+    # order food levels
+    food = factor(food, levels = c("L", "H"), labels = c("Low", "High"))
   ) %>%
+  # add treatment as the combination of Bti and food
+  mutate(treatment = paste(bti, food, sep = "_")) %>%
   # rename time because it also has the date within
   rename(datetime = time) %>%
   # rearrange the order of the columns
   relocate(
-    type,
+    experiment,
     date,
     datetime,
-    mosquito,
+    unit,
     bti,
     food,
     treatment,
     n,
     jar,
     reading,
-    alive,
-    dead,
-    perc
+    alive
   )
 
 # save as csv
-write.csv(data, "data/mosquito-bti-clean.csv", row.names = FALSE)
+write.csv(data, "data/bti-clean.csv", row.names = FALSE)

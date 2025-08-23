@@ -34,7 +34,7 @@ data <- data %>%
     bti = factor(
       bti,
       levels = c("C", "H"),
-      labels = c("Control", "High")
+      labels = c("No", "Yes")
     ),
     # order food levels
     food = factor(food, levels = c("L", "H"), labels = c("Low", "High"))

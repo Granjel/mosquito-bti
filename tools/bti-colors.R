@@ -5,9 +5,9 @@
 pacman::p_load("paletteer")
 
 # define colors per treatment
-lvl <- c("Control_Low", "High_Low", "Control_High", "High_High")
+lvl <- c("No_Low", "Yes_Low", "No_High", "Yes_High")
 
 pal <- setNames(
-  paletteer_d("PNWColors::Bay")[c(1, 2, 4, 5)],
+  paletteer_d("PNWColors::Bay")[c(2, 1, 4, 5)],
   lvl
 )

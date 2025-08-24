@@ -218,3 +218,63 @@ ggsave(
   height = 3.8 * 0.8,
   dpi = 640 * 3
 )
+
+
+# stats! -----------------------------------------------------------------
+
+# 1) name bootstrap vectors by treatment combination
+boot_names <- with(treat_grid, paste(food, bti, sep = "_")) # e.g. "Low_No"
+names(lt50_boot_h) <- boot_names
+boot_named <- lt50_boot_h
+
+# 2) function: summarize difference between two treatments (treatment2 - treatment1)
+contrast_stats <- function(key2, key1) {
+  diff <- boot_named[[key2]] - boot_named[[key1]]
+  data.frame(
+    treatment1 = key1,
+    treatment2 = key2,
+    diff_median_h = median(diff, na.rm = TRUE),
+    ci_low_h = quantile(diff, 0.025, na.rm = TRUE),
+    ci_high_h = quantile(diff, 0.975, na.rm = TRUE),
+    p_value_raw = 2 *
+      pmin(mean(diff > 0, na.rm = TRUE), mean(diff < 0, na.rm = TRUE))
+  )
+}
+
+# 3) generate all pairwise comparisons (choose 2 of 4 = 6)
+pairs <- combn(boot_names, 2, simplify = FALSE)
+
+LT50_contrasts_all <- dplyr::bind_rows(lapply(pairs, function(p) {
+  contrast_stats(p[[2]], p[[1]])
+})) %>%
+  dplyr::mutate(
+    # round numbers
+    diff_median_h = round(diff_median_h, 2),
+    ci_low_h = round(ci_low_h, 2),
+    ci_high_h = round(ci_high_h, 2),
+    # combine into one string "median (low-high)"
+    diff_h_CI = paste0(diff_median_h, " (", ci_low_h, ", ", ci_high_h, ")"),
+    # format p-values
+    p_value = ifelse(
+      p_value_raw < 0.001,
+      "<0.001",
+      sprintf("%.3f", p_value_raw)
+    ),
+    signif = dplyr::case_when(
+      p_value_raw <= 0.001 ~ "***",
+      p_value_raw <= 0.01 ~ "**",
+      p_value_raw <= 0.05 ~ "*",
+      TRUE ~ ""
+    )
+  ) %>%
+  # keep only clean columns
+  dplyr::select(treatment1, treatment2, diff_h_CI, p_value, signif)
+
+print(LT50_contrasts_all)
+
+# 4) save to CSV
+write.csv(
+  LT50_contrasts_all,
+  "tables/table-LT50-contrasts.csv",
+  row.names = FALSE
+)

@@ -1,0 +1,7 @@
+Comparison (B/A),LT50 ratio,95% CI,p
+Yes × Low vs No × Low,0.17,[NA–NA],<0.001
+No × High vs No × Low,1.10,[NA–NA],0.841
+Yes × High vs No × Low,0.58,[NA–NA],0.002
+No × High vs Yes × Low,6.55,[NA–NA],0.026
+Yes × High vs Yes × Low,3.46,[NA–NA],<0.001
+Yes × High vs No × High,0.53,[NA–NA],0.003

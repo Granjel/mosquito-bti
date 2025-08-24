@@ -19,7 +19,7 @@ source("code/01-fetch-data.R")
 source("tools/bti-colors.R")
 
 # define theme for all plots
-theme_set(theme_bw() + theme(strip.background = element_blank()))
+theme_set(theme_bw() + theme(strip.background = element_rect(fill = NA)))
 
 # enforce factor coding and time variables
 data <- data %>%
